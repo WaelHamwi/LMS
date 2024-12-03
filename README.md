@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # 🎉 **Laravel LMS Installation Instructions** 🎉
 
 ## 1. Navigate to the project folder:
