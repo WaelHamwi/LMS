@@ -636,7 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // end of sections submission edit and add
 
     // teachers submission edit and add starts
-    const teacherForm = document.getElementById("teacher-form");
+  const teacherForm = document.getElementById("teacher-form");
 
     if (teacherForm) {
         const teacherModalTitle = document.getElementById("modal-title");
@@ -644,76 +644,71 @@ document.addEventListener("DOMContentLoaded", () => {
         const saveButtonTeacher = document.getElementById(
             "save-button-teacher"
         );
-
         teacherEditButtons.forEach((button) => {
             button.addEventListener("click", function () {
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 const teacherId = this.getAttribute("data-id");
-                console.log("Teacher ID:", teacherId);
 
                 const formData = [
-                    {
-                        id: "field-1-first-name",
-                        value: this.getAttribute("data-first-name"),
-                    },
-                    {
-                        id: "field-2-last-name",
-                        value: this.getAttribute("data-last-name"),
-                    },
-                    {
-                        id: "field-3-email",
-                        value: this.getAttribute("data-email"),
-                    },
-                    { id: "field-4-password", value: "" },
-                    {
-                        id: "field-5-address",
-                        value: this.getAttribute("data-address"),
-                    },
-                    {
-                        id: "field-6-gender",
-                        value: this.getAttribute("data-gender"),
-                    },
+                    { id: "field-1-first-name", attribute: "data-first-name" },
+                    { id: "field-2-last-name", attribute: "data-last-name" },
+                    { id: "field-3-email", attribute: "data-email" },
+                    { id: "field-4-password", attribute: "" },
+                    { id: "field-5-address", attribute: "data-address" },
+                    { id: "field-6-gender", attribute: "data-gender" },
                     {
                         id: "field-7-specialization",
-                        value: this.getAttribute("data-specialization"),
+                        attribute: "data-specialization",
                     },
-                    {
-                        id: "field-8-join-date",
-                        value: this.getAttribute("data-join-date"),
-                    },
+                    { id: "field-8-join-date", attribute: "data-join-date" },
                 ];
 
-                console.log("Form Data:", formData);
+                formData.forEach((field) => {
+                    const element = document.getElementById(field.id);
+                    const value = field.attribute
+                        ? this.getAttribute(field.attribute) || ""
+                        : "";
+
+                    if (element) {
+                        if (
+                            element.type === "date" &&
+                            field.id === "field-8-join-date"
+                        ) {
+                            if (value) {
+                                const formattedDate = new Date(value)
+                                    .toISOString()
+                                    .split("T")[0];
+                                element.value = formattedDate;
+                            }
+                        } else if (
+                            element.tagName === "INPUT" ||
+                            element.tagName === "TEXTAREA"
+                        ) {
+                            element.value = value;
+                        } else if (element.tagName === "SELECT") {
+                            Array.from(element.options).forEach((option) => {
+                                if (
+                                    option.text.trim() === value ||
+                                    option.value.trim() === value
+                                ) {
+                                    option.selected = true;
+                                }
+                            });
+                        }
+                    }
+                });
 
                 setupForm(
                     teacherForm,
                     teacherModalTitle,
-                    `/teachers/${teacherId}`,
-                    formData,
+                    `/teachers/${teacherId}`, // Ensure we pass the correct teacher ID for updates
+                    formData.map((field) => ({
+                        id: field.id,
+                        value: this.getAttribute(field.attribute) || "",
+                    })),
                     "Update Teacher",
-                    "PUT"
+                    "PUT" // Use PUT for updating teacher
                 );
-
-                const genderSelect = document.getElementById("field-6-gender");
-                if (genderSelect) {
-                    Array.from(genderSelect.options).forEach((option) => {
-                        option.selected =
-                            option.textContent.trim() ===
-                            this.getAttribute("data-gender");
-                    });
-                }
-
-                const specializationSelect = document.getElementById(
-                    "field-7-specialization"
-                );
-                if (specializationSelect) {
-                    Array.from(specializationSelect.options).forEach(
-                        (option) => {
-                            option.selected =
-                                option.textContent.trim() ===
-                                this.getAttribute("data-specialization");
-                        }
-                    );
-                }
             });
         });
 
@@ -757,7 +752,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
     // end of Teachers submission edit and add
 
     // Students submission edit and add starts
